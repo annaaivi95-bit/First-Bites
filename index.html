@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>First Bites – meal planner for starting solids</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="First Bites">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#fffdf9;--card:#fff;--ink:#2b2a33;--mute:#6b6a78;--line:#ece8df;--r:#ef476f;--o:#ff9f1c;--y:#ffd23f;--g:#06d6a0;--b:#4cc9f0;--v:#7b6cf6;--sel:#2b2a33;--selt:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1a22;--card:#25242e;--ink:#f4f2ee;--mute:#a9a7b6;--line:#37353f;--sel:#f4f2ee;--selt:#1b1a22}}
+:root[data-theme="dark"]{--bg:#1b1a22;--card:#25242e;--ink:#f4f2ee;--mute:#a9a7b6;--line:#37353f;--sel:#f4f2ee;--selt:#1b1a22}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Nunito,system-ui,sans-serif}
+.bar{height:8px;background:linear-gradient(90deg,var(--r),var(--o),var(--y),var(--g),var(--b),var(--v))}
+main{max-width:720px;margin:0 auto;padding:20px 16px 60px}
+h1,h2,h3{font-family:Fredoka,Nunito,system-ui,sans-serif;margin:0;font-weight:600}
+h1{font-size:30px}h2{font-size:22px;margin:24px 0 8px}h3{font-size:18px}
+.sub{color:var(--mute);margin:4px 0 16px}
+nav{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;margin:12px 0 4px}
+nav button{flex:1;border:0;background:none;color:var(--mute);font:600 13px Nunito,sans-serif;padding:10px 2px;border-radius:999px;cursor:pointer}
+nav button[aria-selected=true]{background:var(--sel);color:var(--selt)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:var(--card);color:var(--ink);font:600 14px Nunito,sans-serif;border-radius:999px;padding:7px 14px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--c,var(--sel));border-color:var(--c,var(--sel));color:#1b1a22}
+.stages{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stage{text-align:left;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:18px;padding:12px;cursor:pointer;font:600 14px Nunito,sans-serif;border-top:8px solid var(--c)}
+.stage b{display:block;font:600 18px Fredoka,sans-serif}
+.stage span{color:var(--mute);font-weight:400;font-size:13px}
+.stage[aria-pressed=true]{background:var(--c);border-color:var(--c);color:#1b1a22}
+.stage[aria-pressed=true] span{color:#1b1a22}
+.note{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--o);border-radius:12px;padding:10px 14px;font-size:14px;color:var(--mute);margin-top:16px}
+.cta{display:inline-block;border:0;background:var(--sel);color:var(--selt);font:600 16px Fredoka,sans-serif;border-radius:999px;padding:12px 24px;cursor:pointer;margin-top:20px}
+.ghost{border:2px solid var(--line);background:none;color:var(--ink);font:600 13px Nunito,sans-serif;border-radius:999px;padding:5px 12px;cursor:pointer}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.meal{background:var(--card);border:1px solid var(--line);border-left:8px solid var(--c);border-radius:16px;padding:14px 16px;margin:12px 0}
+.meal .row{justify-content:space-between}
+.meal p{margin:6px 0;color:var(--mute);font-size:14px}
+.tag{display:inline-block;background:var(--line);border-radius:999px;font-size:12px;padding:2px 10px;margin:2px 4px 0 0}
+.cat{margin:20px 0 4px;font:600 17px Fredoka,sans-serif;display:flex;align-items:center;gap:8px}
+.cat i{width:12px;height:12px;border-radius:50%;background:var(--c)}
+label.item{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+label.item input{width:22px;height:22px;accent-color:var(--g)}
+label.item.done span{text-decoration:line-through;color:var(--mute)}
+.empty{text-align:center;color:var(--mute);padding:40px 10px}
+.plan-ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.form{display:grid;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+input,textarea{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px;width:100%}
+.ad{background:var(--bg);border-radius:10px;padding:8px 12px;color:var(--ink)!important}
+.ghost[aria-pressed=true]{background:var(--g);border-color:var(--g);color:#1b1a22}
+#unit{margin-bottom:4px}
+.pay{background:var(--card);border:2px solid var(--v);border-radius:16px;padding:14px 16px;margin:12px 0}.pay p{margin:4px 0}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.dlg{background:var(--card);border-radius:20px;padding:20px;max-width:420px;width:100%;border-top:8px solid var(--r)}
+.dlg p{margin:8px 0}
+@media (max-width:520px){.stages{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bar"></div>
+<main>
+  <h1>First Bites</h1>
+  <p class="sub">Meal ideas and a shopping list for babies and toddlers starting solids.</p>
+  <div id="kids" class="chips" style="margin-bottom:10px"></div>
+  <div id="unit" class="row"></div>
+  <nav role="tablist" id="nav">
+    <button role="tab" data-t="setup">Set up</button>
+    <button role="tab" data-t="menu">Menu</button>
+    <button role="tab" data-t="shop">Shopping</button>
+    <button role="tab" data-t="cooked">Cooked</button>
+    <button role="tab" data-t="tried">Tried</button>
+  </nav>
+  <section id="view"></section>
+  <div id="modal"></div>
+</main>
+<script>
+const COL=["#ef476f","#ff9f1c","#ffd23f","#06d6a0","#4cc9f0","#7b6cf6"];
+const STAGES=[{n:"6–8 months",d:"Smooth purées and soft mashes",c:COL[1]},{n:"9–12 months",d:"Lumpy mashes and soft finger foods",c:COL[3]},{n:"12–24 months",d:"Family-style toddler meals",c:COL[5]}];
+const ALL=["Egg","Dairy","Peanut","Wheat","Soy","Fish","Sesame","Tree nut","Shellfish"];
+const CAT={"Fruit & veg":COL[3],"Meat & fish":COL[0],"Dairy & eggs":COL[2],"Grains & bread":COL[1],"Pantry":COL[4]};
+const ING={"sweet potato":"Fruit & veg","apple":"Fruit & veg","avocado":"Fruit & veg","banana":"Fruit & veg","peas":"Fruit & veg","pear":"Fruit & veg","butternut squash":"Fruit & veg","carrot":"Fruit & veg","potato":"Fruit & veg","broccoli":"Fruit & veg","zucchini":"Fruit & veg","blueberries":"Fruit & veg","tomato":"Fruit & veg","cauliflower":"Fruit & veg","cucumber":"Fruit & veg",
+"chicken":"Meat & fish","salmon":"Meat & fish","beef":"Meat & fish","tofu":"Meat & fish",
+"egg":"Dairy & eggs","cheese":"Dairy & eggs","yoghurt":"Dairy & eggs","milk":"Dairy & eggs",
+"oats":"Grains & bread","pasta":"Grains & bread","bread":"Grains & bread","rice":"Grains & bread","breadcrumbs":"Grains & bread",
+"red lentils":"Pantry","chickpeas":"Pantry","peanut butter":"Pantry","tahini":"Pantry","soy sauce":"Pantry","spinach":"Fruit & veg","mango":"Fruit & veg","strawberries":"Fruit & veg","green beans":"Fruit & veg","corn":"Fruit & veg","mushroom":"Fruit & veg","onion":"Fruit & veg","peach":"Fruit & veg","kiwi":"Fruit & veg","capsicum":"Fruit & veg","white fish":"Meat & fish","tuna":"Meat & fish","turkey":"Meat & fish","lamb":"Meat & fish","prawns":"Meat & fish","ricotta":"Dairy & eggs","quinoa":"Grains & bread","tortilla":"Grains & bread","kidney beans":"Pantry","black beans":"Pantry","almond butter":"Pantry"};
+// s = suitable stages (0,1,2); al = allergens
+const R=[
+{n:"Sweet potato & apple purée",s:[0],i:["sweet potato","apple"],al:[],t:"Steam until soft, blend smooth, thin with water or usual milk."},
+{n:"Avocado & banana mash",s:[0,1],i:["avocado","banana"],al:[],t:"Mash with a fork. Serve fresh."},
+{n:"Pea & potato purée",s:[0,1],i:["peas","potato"],al:[],t:"Blend peas well so no skins remain for the youngest eaters."},
+{n:"Creamy oat porridge with pear",s:[0,1,2],i:["oats","pear"],al:[],t:"Cook oats in water or usual milk, stir through grated cooked pear."},
+{n:"Butternut & red lentil purée",s:[0,1],i:["butternut squash","red lentils"],al:[],t:"Simmer until lentils break down. Good iron source."},
+{n:"Chicken, carrot & potato purée",s:[0],i:["chicken","carrot","potato"],al:[],t:"Cook chicken thoroughly and blend until completely smooth."},
+{n:"Peanut oat swirl",s:[0,1],i:["peanut butter","oats"],al:["Peanut"],t:"Thin smooth peanut butter with warm water and stir into oats. Never whole nuts."},
+{n:"Egg & broccoli mash",s:[0,1],i:["egg","broccoli"],al:["Egg"],t:"Cook egg fully, mash with steamed broccoli florets."},
+{n:"Banana oat pancake fingers",s:[1,2],i:["banana","oats","egg"],al:["Egg"],t:"Blend, pan-cook small, cut into finger strips."},
+{n:"Soft veggie omelette fingers",s:[1,2],i:["egg","zucchini","cheese"],al:["Egg","Dairy"],t:"Grate zucchini finely and cook the omelette through."},
+{n:"Salmon & sweet potato cakes",s:[1,2],i:["salmon","sweet potato"],al:["Fish"],t:"Flake carefully and check for bones. Bake rather than fry."},
+{n:"Lentil bolognese with pasta",s:[1,2],i:["red lentils","tomato","carrot","pasta"],al:["Wheat"],t:"Cook pasta very soft. Use small shapes for 9–12 months."},
+{n:"Yoghurt with mashed blueberries",s:[1,2],i:["yoghurt","blueberries"],al:["Dairy"],t:"Use plain full-fat yoghurt. Squash berries flat for young babies."},
+{n:"Avocado toast fingers",s:[1,2],i:["avocado","bread"],al:["Wheat"],t:"Lightly toast, spread thinly, cut into strips."},
+{n:"Mini chicken & zucchini meatballs",s:[2],i:["chicken","zucchini","breadcrumbs","egg"],al:["Wheat","Egg"],t:"Bake until cooked through, cut in half for safe bite size."},
+{n:"Veggie fried rice",s:[2],i:["rice","egg","peas","carrot","soy sauce"],al:["Egg","Soy"],t:"Use a splash of low-salt soy sauce only."},
+{n:"Hidden-cauliflower mac & cheese",s:[2],i:["pasta","cheese","cauliflower","milk"],al:["Wheat","Dairy"],t:"Blend the cauliflower into the cheese sauce."},
+{n:"Tofu & broccoli stir-fry",s:[1,2],i:["tofu","broccoli","rice"],al:["Soy"],t:"Cut tofu into soft cubes or strips and cook broccoli until tender."},
+{n:"Hummus & veggie plate",s:[2],i:["chickpeas","tahini","cucumber","carrot"],al:["Sesame"],t:"Steam or grate carrot, peel cucumber and cut into thin sticks."},
+{n:"Beef & sweet potato stew",s:[1,2],i:["beef","sweet potato","carrot","peas"],al:[],t:"Slow cook until falling apart, then mash or shred."},
+{n:"Mango & yoghurt purée",s:[0, 1],i:["mango", "yoghurt"],al:["Dairy"],t:"Blend ripe mango with plain full-fat yoghurt."},
+{n:"Peach & oat purée",s:[0],i:["peach", "oats"],al:[],t:"Peel and stew the peach, blend with cooked oats."},
+{n:"Spinach & potato mash",s:[0, 1],i:["spinach", "potato"],al:[],t:"Wilt spinach, blend well with soft potato."},
+{n:"Carrot & lentil purée",s:[0, 1],i:["carrot", "red lentils"],al:[],t:"Simmer until very soft and blend."},
+{n:"Turkey & sweet potato purée",s:[0],i:["turkey", "sweet potato"],al:[],t:"Cook turkey thoroughly and blend until smooth."},
+{n:"Green bean & pear purée",s:[0],i:["green beans", "pear"],al:[],t:"Steam until very soft and blend."},
+{n:"White fish & pea purée",s:[0, 1],i:["white fish", "peas", "potato"],al:["Fish"],t:"Check carefully for bones before blending."},
+{n:"Ricotta & strawberry mash",s:[0, 1],i:["ricotta", "strawberries"],al:["Dairy"],t:"Mash berries into ricotta."},
+{n:"Almond butter banana oats",s:[0, 1],i:["almond butter", "banana", "oats"],al:["Tree nut"],t:"Use smooth almond butter thinned with warm water. Never whole nuts."},
+{n:"Lamb & butternut purée",s:[0],i:["lamb", "butternut squash"],al:[],t:"Slow cook lamb, blend with squash. Good iron source."},
+{n:"Corn & zucchini fritters",s:[1, 2],i:["corn", "zucchini", "egg", "oats"],al:["Egg"],t:"Pan-cook small fritters and cut into fingers."},
+{n:"Mushroom & spinach frittata fingers",s:[1, 2],i:["mushroom", "spinach", "egg", "cheese"],al:["Egg", "Dairy"],t:"Chop vegetables finely and bake the frittata through."},
+{n:"Tuna & potato patties",s:[1, 2],i:["tuna", "potato", "peas"],al:["Fish"],t:"Use tuna in spring water, with no added salt. Limit how often you serve it."},
+{n:"Black bean & avocado toast",s:[1, 2],i:["black beans", "avocado", "bread"],al:["Wheat"],t:"Mash beans well and spread thinly on toast fingers."},
+{n:"Turkey & tomato meatballs",s:[1, 2],i:["turkey", "tomato", "onion", "oats"],al:[],t:"Bake until cooked through and cut small."},
+{n:"Kiwi & yoghurt cup",s:[1, 2],i:["kiwi", "yoghurt"],al:["Dairy"],t:"Mash kiwi into plain yoghurt."},
+{n:"Chicken & veggie mini muffins",s:[1, 2],i:["chicken", "carrot", "zucchini", "egg", "oats"],al:["Egg"],t:"Bake in a mini tin and cool before serving."},
+{n:"Lamb kofta fingers",s:[1, 2],i:["lamb", "onion", "spinach"],al:[],t:"Shape into fingers and bake until cooked through."},
+{n:"Prawn & veggie rice patties",s:[2],i:["prawns", "rice", "peas", "egg"],al:["Shellfish", "Egg"],t:"Chop prawns finely and cook through. Introduce shellfish carefully."},
+{n:"Mango rice pudding",s:[1, 2],i:["mango", "rice", "milk"],al:["Dairy"],t:"Simmer rice in milk until soft and stir through mango."},
+{n:"Chicken quesadilla strips",s:[2],i:["chicken", "tortilla", "cheese", "capsicum"],al:["Wheat", "Dairy"],t:"Cut into thin strips, with capsicum cooked very soft."},
+{n:"Homemade fish fingers",s:[2],i:["white fish", "breadcrumbs", "egg"],al:["Fish", "Wheat", "Egg"],t:"Bake rather than fry and check for bones."},
+{n:"Veggie & bean chilli with rice",s:[2],i:["kidney beans", "tomato", "capsicum", "onion", "rice"],al:[],t:"Keep it mild for little ones."},
+{n:"Quinoa veggie bites",s:[2],i:["quinoa", "carrot", "spinach", "egg", "cheese"],al:["Egg", "Dairy"],t:"Bake in mini portions."},
+{n:"Beef & mushroom mini burgers",s:[2],i:["beef", "mushroom", "onion", "breadcrumbs", "egg"],al:["Wheat", "Egg"],t:"Cook through and cut into quarters."},
+{n:"Butternut soup with cheese toast",s:[1, 2],i:["butternut squash", "onion", "potato", "bread", "cheese"],al:["Wheat", "Dairy"],t:"Blend the soup and serve toast cut into fingers."},
+{n:"Tuna pasta bake",s:[2],i:["tuna", "pasta", "peas", "cheese", "milk"],al:["Fish", "Wheat", "Dairy"],t:"Use tuna in spring water. Limit how often you serve it."},
+{n:"Strawberry oat bars",s:[1, 2],i:["strawberries", "oats", "banana"],al:[],t:"Bake soft bars with no added sugar."},
+{n:"Mild chicken & sweet potato curry",s:[2],i:["chicken", "sweet potato", "tomato", "rice", "peas"],al:[],t:"Use mild spices only and no added salt."},
+{n:"Lentil & spinach soup with toast",s:[1, 2],i:["red lentils", "spinach", "carrot", "bread"],al:["Wheat"],t:"Blend until smooth and serve with toast fingers."},
+{n:"Egg fried quinoa",s:[2],i:["quinoa", "egg", "peas", "corn"],al:["Egg"],t:"Scramble the egg through cooked quinoa and veg."},
+{n:"Peach & ricotta pancakes",s:[1, 2],i:["peach", "ricotta", "egg", "oats"],al:["Dairy", "Egg"],t:"Cook small pancakes and cut into strips."}
+];
+// rough amounts per meal: [amount, g | ml | n]
+const Q={"sweet potato":[150,"g"],"apple":[100,"g"],"avocado":[100,"g"],"banana":[100,"g"],"peas":[80,"g"],"pear":[100,"g"],"butternut squash":[150,"g"],"carrot":[80,"g"],"potato":[100,"g"],"broccoli":[80,"g"],"zucchini":[80,"g"],"blueberries":[60,"g"],"tomato":[150,"g"],"cauliflower":[100,"g"],"cucumber":[60,"g"],"chicken":[100,"g"],"salmon":[100,"g"],"beef":[120,"g"],"tofu":[100,"g"],"egg":[1,"n"],"cheese":[40,"g"],"yoghurt":[120,"g"],"milk":[100,"ml"],"oats":[40,"g"],"pasta":[60,"g"],"bread":[2,"n"],"rice":[60,"g"],"breadcrumbs":[30,"g"],"red lentils":[50,"g"],"chickpeas":[100,"g"],"peanut butter":[15,"g"],"tahini":[15,"g"],"soy sauce":[5,"ml"],"spinach":[40, "g"],"mango":[100, "g"],"strawberries":[80, "g"],"green beans":[80, "g"],"corn":[60, "g"],"mushroom":[60, "g"],"onion":[40, "g"],"peach":[100, "g"],"kiwi":[80, "g"],"capsicum":[60, "g"],"white fish":[100, "g"],"tuna":[80, "g"],"turkey":[100, "g"],"lamb":[120, "g"],"prawns":[80, "g"],"ricotta":[60, "g"],"quinoa":[50, "g"],"tortilla":[1, "n"],"kidney beans":[80, "g"],"black beans":[80, "g"],"almond butter":[15, "g"]};
+const QTY=Q;
+const AX={"salt":"Pantry","pepper":"Pantry","cinnamon":"Pantry","chilli flakes":"Pantry","chilli sauce":"Pantry","honey":"Pantry","lemon":"Fruit & veg","mint":"Fruit & veg","garlic":"Fruit & veg","ginger":"Fruit & veg","butter":"Dairy & eggs","parmesan":"Dairy & eggs"};
+const DEF=["Season your portion with salt, pepper and a squeeze of lemon.",["salt","pepper","lemon"]];
+const AD={
+"Sweet potato & apple purée":["Stir in cinnamon and a pinch of salt.",["cinnamon","salt"]],
+"Pea & potato purée":["Mash with butter, salt, pepper and fresh mint.",["butter","salt","pepper","mint"]],
+"Creamy oat porridge with pear":["Top with honey and cinnamon. Honey is for adults only, never for babies under 12 months.",["honey","cinnamon"]],
+"Chicken, carrot & potato purée":["Add garlic, salt, pepper and chilli flakes, and eat it as a stew.",["garlic","salt","pepper","chilli flakes"]],
+"Banana oat pancake fingers":["Top with honey and berries. Keep honey away from babies under 12 months.",["honey"]],
+"Soft veggie omelette fingers":["Season with salt, pepper and chilli flakes.",["salt","pepper","chilli flakes"]],
+"Salmon & sweet potato cakes":["Serve with lemon, salt and a pinch of chilli.",["lemon","salt","chilli flakes"]],
+"Lentil bolognese with pasta":["Add garlic, chilli flakes, salt and grated parmesan.",["garlic","chilli flakes","salt","parmesan"]],
+"Mini chicken & zucchini meatballs":["Add garlic and salt to the mix, and serve with chilli sauce.",["garlic","salt","chilli sauce"]],
+"Veggie fried rice":["Add garlic, chilli and extra soy sauce to your bowl.",["garlic","chilli flakes"]],
+"Hidden-cauliflower mac & cheese":["Add salt, pepper and chilli flakes.",["salt","pepper","chilli flakes"]],
+"Tofu & broccoli stir-fry":["Add garlic, ginger, chilli and extra soy sauce.",["garlic","ginger","chilli flakes"]],
+"Hummus & veggie plate":["Add lemon, garlic and salt to the hummus.",["lemon","garlic","salt"]],
+"Beef & sweet potato stew":["Add salt, pepper and chilli flakes.",["salt","pepper","chilli flakes"]]};
+const adx=r=>(AD[r.n]||DEF)[1],adt=r=>(AD[r.n]||DEF)[0];
+function adlt(k){const n=S.plan[k];S.adult[n]=!S.adult[n];save();draw()}
+function fmt(i,t){const q=Q[i];if(!q)return"";const m=S.unit==="metric";
+ if(q[1]==="n")return "× "+t;
+ if(q[1]==="g"){if(m)return t>=1000?(t/1000).toFixed(1)+" kg":t+" g";const o=t/28.35;return o>=16?(o/16).toFixed(1)+" lb":(Math.round(o*10)/10)+" oz"}
+ if(m)return t>=1000?(t/1000).toFixed(1)+" L":t+" ml";return (Math.round(t/29.57*10)/10)+" fl oz"}
+const unitSeg=()=>["metric","imperial"].map(u=>`<button class="chip" aria-pressed="${S.unit===u}" onclick="S.unit='${u}';save();draw()">${u[0].toUpperCase()+u.slice(1)}</button>`).join("");
+let RX=0;
+const RXN=[["No reaction",COL[3]],["Mild reaction",COL[2]],["Allergy or reaction",COL[0]]];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function setRx(v){RX=v;document.querySelectorAll(".rx").forEach((b,i)=>b.setAttribute("aria-pressed",i===v))}
+function addTried(){const f=$("#tf").value.trim().toLowerCase().replace(/[^a-z0-9 -]/g,"");if(!f)return;S.tried.unshift({f,r:RX,note:$("#tn").value.trim(),d:new Date().toLocaleDateString()});if(RX===2&&!S.avoid.includes(f))POP=f;RX=0;save();draw()}
+function delTried(k){S.tried.splice(k,1);save();draw()}
+let POP=null;
+function setTr(k,v){const t=S.tried[k],was=t.r;t.r=v;if(v===2&&was!==2&&!S.avoid.includes(t.f))POP=t.f;save();draw()}
+function noteTr(k,v){S.tried[k].note=v.trim();save()}
+function popAns(yes){const f=POP;POP=null;if(yes){if(!S.avoid.includes(f))S.avoid.push(f);S.plan=S.plan.filter(n=>{const r=R.find(x=>x.n===n);return r&&!r.i.includes(f)})}save();draw()}
+function popHtml(){if(!POP)return"";const n=esc(S.kids[S.cur].name),f=esc(POP);
+ return `<div class="ov"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dt"><h3 id="dt">Remove ${f} from future meals?</h3><p>You logged an allergy or reaction to ${f} for ${n}. Should ${f} be removed from all of ${n}’s future meals?</p><div class="row"><button class="cta" style="margin:0" onclick="popAns(true)">Yes, remove it</button><button class="ghost" onclick="popAns(false)">No, keep it</button></div><p class="sub">Please also talk to your doctor about any reaction.</p></div></div>`}
+function ate(k,i){
+ const r=R[k],c=S.kids[i],a=c.ate||(c.ate=[]),t=i===S.cur?S.tried:(c.tried||(c.tried=[])),j=a.indexOf(r.n);
+ if(j>=0){a.splice(j,1);for(let x=t.length-1;x>=0;x--)if(t[x].via===r.n&&t[x].r===0&&!t[x].note)t.splice(x,1)}
+ else{a.push(r.n);const d=new Date().toLocaleDateString();r.i.forEach(f=>{if(!t.some(e=>e.f===f))t.unshift({f,r:0,note:"",d,via:r.n})})}
+ save();draw()}
+function cooked(){
+ const ms=[...new Set(S.kids.flatMap(k=>k.plan||[]))].map(n=>R.find(r=>r.n===n)).filter(Boolean);
+ if(!ms.length)return `<div class="empty">Add meals to your menu first, then mark them as cooked here.<br><button class="cta" onclick="S.tab='menu';draw()">Choose meals</button></div>`;
+ return `<h2>Meals cooked</h2><p class="sub">Tap a child’s name to record that they ate the meal. Its foods are added to the Tried tab as “No reaction”, so update them there if you notice anything.</p>
+ ${ms.map(r=>{const k=R.indexOf(r);return `<div class="meal" style="--c:${COL[k%6]}"><h3>${r.n}</h3><p>${r.i.join(", ")}</p><div class="chips">${S.kids.map((c,i)=>`<button class="chip" style="--c:${COL[i%6]}" aria-pressed="${(c.ate||[]).includes(r.n)}" onclick="ate(${k},${i})">${esc(c.name)}</button>`).join("")}</div></div>`}).join("")}`;
+}
+function tried(){
+ const names=Object.keys(ING).sort();
+ return `<h2>Foods tried</h2><p class="sub">Foods are added here when you mark a meal as cooked. Set the reaction and add notes for each one.</p>
+ <div class="form"><input id="tf" list="fl" placeholder="Add another food, e.g. egg" aria-label="Food"><datalist id="fl">${names.map(n=>`<option value="${n}">`).join("")}</datalist>
+ <div class="chips">${RXN.map((x,i)=>`<button class="chip rx" style="--c:${x[1]}" aria-pressed="${RX===i}" onclick="setRx(${i})">${x[0]}</button>`).join("")}</div>
+ <textarea id="tn" rows="2" placeholder="Notes" aria-label="Notes"></textarea>
+ <button class="cta" style="margin-top:4px" onclick="addTried()">Add to list</button></div>
+ ${S.tried.length?S.tried.map((t,k)=>`<div class="meal" style="--c:${RXN[t.r][1]}"><div class="row"><h3>${esc(t.f)}</h3><button class="ghost" onclick="delTried(${k})" aria-label="Delete ${esc(t.f)}">Delete</button></div><p>${esc(t.d)}${t.via?" from "+esc(t.via):""}</p>
+ <div class="chips">${RXN.map((x,i)=>`<button class="chip" style="--c:${x[1]}" aria-pressed="${t.r===i}" onclick="setTr(${k},${i})">${x[0]}</button>`).join("")}</div>
+ <input style="margin-top:8px" value="${esc(t.note)}" placeholder="Add a note, e.g. rash after 20 minutes" aria-label="Note for ${esc(t.f)}" onchange="noteTr(${k},this.value)"></div>`).join(""):`<div class="empty">Nothing logged yet. Mark a meal as cooked to add its foods here.</div>`}
+ <div class="note">If you see swelling, hives, vomiting, trouble breathing, or your child seems unwell after a new food, get urgent medical help. Tell your doctor about any reaction before offering that food again.</div>`;
+}
+function triedOld(){
+ const names=Object.keys(ING).sort();
+ return `<h2>Foods tried</h2><p class="sub">Log each new food and how your little one reacted. Foods marked as an allergy or reaction are left out of your menus.</p>
+ <div class="form"><input id="tf" list="fl" placeholder="Food, e.g. egg" aria-label="Food"><datalist id="fl">${names.map(n=>`<option value="${n}">`).join("")}</datalist>
+ <div class="chips">${RXN.map((x,i)=>`<button class="chip rx" style="--c:${x[1]}" aria-pressed="${RX===i}" onclick="setRx(${i})">${x[0]}</button>`).join("")}</div>
+ <textarea id="tn" rows="2" placeholder="Notes, e.g. rash around mouth after 20 minutes" aria-label="Notes"></textarea>
+ <button class="cta" style="margin-top:4px" onclick="addTried()">Add to list</button></div>
+ ${S.tried.length?S.tried.map((t,k)=>`<div class="meal" style="--c:${RXN[t.r][1]}"><div class="row"><h3>${esc(t.f)}</h3><button class="ghost" onclick="delTried(${k})" aria-label="Delete ${esc(t.f)}">Delete</button></div><p>${RXN[t.r][0]} on ${esc(t.d)}</p>${t.note?`<p style="color:var(--ink)">${esc(t.note)}</p>`:""}</div>`).join(""):`<div class="empty">Nothing logged yet. Add the first food your baby tries.</div>`}
+ <div class="note">If you see swelling, hives, vomiting, trouble breathing, or your child seems unwell after a new food, get urgent medical help. Tell your doctor about any reaction before offering that food again.</div>`;
+}
+const FREE=5,KF=["stage","al","avoid","plan","done","adult","tried"];
+let S={stage:0,al:[],avoid:[],plan:[],n:5,done:{},tab:"setup",unit:"metric",tried:[],adult:{},kids:[{name:"Child 1"}],cur:0,seen:[],unlocked:true,fav:[],view:"all"};
+function pull(){KF.forEach(f=>S.kids[S.cur][f]=S[f])}
+function push(){KF.forEach(f=>S[f]=S.kids[S.cur][f])}
+function pick(i){pull();S.cur=i;push();save();draw()}
+function addKid(){pull();S.kids.push({name:"Child "+(S.kids.length+1),stage:0,al:[],avoid:[],plan:[],done:{},adult:{},tried:[]});S.cur=S.kids.length-1;push();save();draw()}
+function delKid(){if(S.kids.length<2)return;S.kids.splice(S.cur,1);S.cur=0;push();save();draw()}
+const left=()=>Math.max(0,FREE-S.seen.length);
+function charge(ns){ns.forEach(n=>{if(!S.seen.includes(n))S.seen.push(n)})}
+function pay(){
+ const b=`<div class="note">Recipes here are unverified and have not been reviewed by a dietitian. Check each one yourself.</div>`;
+ if(S.unlocked)return b;
+ if(left()>0)return b+`<p class="sub">${left()} of ${FREE} free menu items left.</p>`;
+ return b+`<div class="pay"><h3>You’ve used your ${FREE} free menu items</h3><p>Unlock unlimited menu items with a one-time payment of $20 AUD.</p><button class="cta" onclick="S.unlocked=true;save();draw()">Unlock for $20 AUD (demo)</button><p class="sub">Demo only. The live app would use App Store and Google Play billing.</p></div>`;
+}
+try{const x=JSON.parse(localStorage.getItem("fb")||"null");if(x)S=Object.assign(S,x)}catch(e){}
+if(!S.seen)S.seen=[];
+S.kids[S.cur].stage!==undefined?push():pull();
+const save=()=>{pull();try{localStorage.setItem("fb",JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s);
+const ok=r=>r.s.includes(S.stage)&&!r.al.some(a=>S.al.includes(a))&&!r.i.some(i=>S.avoid.includes(i));
+const pool=()=>R.filter(ok);
+const colorOf=r=>COL[R.indexOf(r)%6];
+function toggle(arr,v){const k=S[arr].indexOf(v);k<0?S[arr].push(v):S[arr].splice(k,1);save();draw()}
+function suggest(){
+  let c=pool().sort(()=>Math.random()-.5);if(!S.unlocked){const o=c.filter(r=>S.seen.includes(r.n)),w=c.filter(r=>!S.seen.includes(r.n));c=o.concat(w.slice(0,left()))}const p=c.slice(0,S.n).map(r=>r.n);charge(p);
+  S.plan=p;S.done={};S.tab="menu";save();draw();
+}
+function swap(k){
+  const used=S.plan,opts=pool().filter(r=>!used.includes(r.n)&&(S.unlocked||S.seen.includes(r.n)||left()>0));
+  if(opts.length){S.plan[k]=opts[Math.floor(Math.random()*opts.length)].n;charge([S.plan[k]]);save();draw()}
+}
+function drop(k){S.plan.splice(k,1);save();draw()}
+function setup(){
+  const ings=Object.keys(ING).concat(S.avoid.filter(a=>!ING[a])).sort();
+  return `<h2>Child’s name</h2><div class="row"><input id="kn" value="${esc(S.kids[S.cur].name)}" aria-label="Child’s name" onchange="S.kids[S.cur].name=this.value.trim()||'Child';save();draw()" style="max-width:260px">${S.kids.length>1?`<button class="ghost" onclick="delKid()">Remove child</button>`:""}</div>
+  <h2>How old is your little one?</h2>
+  <div class="stages">${STAGES.map((s,i)=>`<button class="stage" style="--c:${s.c}" aria-pressed="${S.stage===i}" onclick="S.stage=${i};S.plan=[];save();draw()"><b>${s.n}</b><span>${s.d}</span></button>`).join("")}</div>
+  <h2>Any allergies to avoid?</h2>
+  <div class="chips">${ALL.map((a,i)=>`<button class="chip" style="--c:${COL[i%6]}" aria-pressed="${S.al.includes(a)}" onclick="toggle('al','${a}')">${a}</button>`).join("")}</div>
+  <h2>Ingredients to skip</h2>
+  <p class="sub" style="margin-top:0">Tap anything your baby dislikes or you would rather not buy.</p>
+  <div class="chips">${ings.map((a,i)=>`<button class="chip" style="--c:${COL[i%6]}" aria-pressed="${S.avoid.includes(a)}" onclick="toggle('avoid','${a}')">${a}</button>`).join("")}</div>
+  <p class="sub" style="margin-top:16px"><b>${pool().length}</b> meals match these choices.</p>
+  <button class="cta" onclick="S.tab='menu';draw()" ${pool().length?"":"disabled"}>Choose meals</button>${S.unlocked?"":`<span class="sub"> ${left()} of ${FREE} free menu items left</span>`}
+  <div class="note">Offer common allergens one at a time, in small amounts, and watch for reactions. Avoid honey before 12 months, whole nuts, and hard or round foods like whole grapes. This app is a starting point, so check with your child’s doctor or nurse about allergies and readiness for solids.</div>`;
+}
+function fav(k){const n=R[k].n,i=S.fav.indexOf(n);i<0?S.fav.push(n):S.fav.splice(i,1);save();draw()}
+function pickMeal(k){const n=R[k].n,i=S.plan.indexOf(n);if(i>=0)S.plan.splice(i,1);else{charge([n]);S.plan.push(n)}save();draw()}
+function adm(k){const n=R[k].n;S.adult[n]=!S.adult[n];save();draw()}
+function card(r,lk){
+ const on=S.plan.includes(r.n),fv=S.fav.includes(r.n),k=R.indexOf(r);
+ return `<div class="meal" style="--c:${COL[k%6]}"><div class="row"><h3>${r.n}</h3><span class="row"><button class="ghost" aria-pressed="${fv}" style="${fv?"background:var(--r);border-color:var(--r);color:#fff":""}" aria-label="${fv?"Remove from favourites":"Save to favourites"}" onclick="fav(${k})">${fv?"♥":"♡"}</button>${on?`<button class="ghost" aria-pressed="${!!S.adult[r.n]}" onclick="adm(${k})">Adults too</button>`:""}${lk?`<button class="ghost" onclick="scrollTo(0,0)">Unlock to add</button>`:`<button class="ghost" aria-pressed="${on}" onclick="pickMeal(${k})">${on?"Added":"Add"}</button>`}</span></div>
+ <p>${r.t}</p><div>${r.i.map(i=>`<span class="tag">${i} ${fmt(i,Q[i][0])}</span>`).join("")}${r.al.map(a=>`<span class="tag" style="background:var(--o);color:#1b1a22">${a}</span>`).join("")}</div>${on&&S.adult[r.n]?`<p class="ad"><b>Adult serve:</b> ${adt(r)} Set your baby’s portion aside before seasoning.</p>`:""}</div>`;
+}
+function menu(){
+ const all=pool(),fo=S.view==="fav",list=all.filter(r=>!fo||S.fav.includes(r.n));
+ const lock=r=>!S.unlocked&&!S.seen.includes(r.n)&&left()<=0;
+ return `<h2>Choose your meals <span class="sub" style="font-size:15px">(${S.plan.length} selected)</span></h2>${pay()}
+ <div class="chips" style="margin:8px 0 4px"><button class="chip" aria-pressed="${!fo}" onclick="S.view='all';save();draw()">All meals (${all.length})</button><button class="chip" aria-pressed="${fo}" onclick="S.view='fav';save();draw()">Favourites (${all.filter(r=>S.fav.includes(r.n)).length})</button></div>
+ ${list.length?list.map(r=>card(r,lock(r))).join(""):`<div class="empty">${fo?"No favourites yet. Tap the heart on a meal to save it.":"No meals match these choices. Try removing a skipped ingredient."}</div>`}
+ ${S.plan.length?`<button class="cta" onclick="S.tab='shop';draw()">See shopping list (${S.plan.length} meals)</button>`:""}`;
+}
+function menuOld(){
+  if(!S.plan.length)return pay()+`<div class="empty">No menu yet.<br><button class="cta" onclick="S.tab='setup';draw()">Set up your plan</button></div>`;
+  const items=S.plan.map(n=>R.find(r=>r.n===n)).filter(Boolean);
+  return `<h2>This week’s menu <span class="sub" style="font-size:15px">· ${STAGES[S.stage].n}</span></h2>
+  ${pay()}<div class="plan-ctl"><button class="ghost" onclick="suggest()">Shuffle all</button><span class="sub" style="margin:0">Choose how many:</span>
+  ${[3,5,7].map(n=>`<button class="chip" aria-pressed="${S.n===n}" onclick="S.n=${n};suggest()">${n}</button>`).join("")}</div>
+  ${items.map((r,k)=>`<div class="meal" style="--c:${colorOf(r)}"><div class="row"><h3>${r.n}</h3><span class="row"><button class="ghost" aria-pressed="${!!S.adult[r.n]}" onclick="adlt(${k})">Adults too</button><button class="ghost" onclick="swap(${k})">Swap</button><button class="ghost" onclick="drop(${k})" aria-label="Remove ${r.n}">Remove</button></span></div>
+  <p>${r.t}</p><div>${r.i.map(i=>`<span class="tag">${i} ${fmt(i,Q[i][0])}</span>`).join("")}${r.al.map(a=>`<span class="tag" style="background:var(--o);color:#1b1a22">${a}</span>`).join("")}</div>${S.adult[r.n]?`<p class="ad"><b>Adult serve:</b> ${adt(r)} Set your baby’s portion aside before seasoning.</p>`:""}</div>`).join("")}
+  <button class="cta" onclick="S.tab='shop';draw()">See shopping list</button>`;
+}
+function shop(){
+  const items=S.plan.map(n=>R.find(r=>r.n===n)).filter(Boolean);
+  if(!items.length)return `<div class="empty">Your shopping list will appear here once you have a menu.<br><button class="cta" onclick="S.tab='setup';draw()">Set up your plan</button></div>`;
+  const cnt={},tot={};items.forEach(r=>{r.i.forEach(i=>{cnt[i]=(cnt[i]||0)+1;tot[i]=(tot[i]||0)+Q[i][0]});if(S.adult[r.n])adx(r).forEach(i=>{cnt[i]=(cnt[i]||0)+1})});
+  const by={};Object.keys(cnt).forEach(i=>(by[ING[i]||AX[i]]=by[ING[i]||AX[i]]||[]).push(i));
+  return `<h2>Shopping list</h2><p class="sub">${Object.keys(cnt).length} items for ${items.length} meals. Amounts are rough, based on one baby-sized batch per meal. Tap to tick off.</p>
+  ${Object.keys(CAT).filter(c=>by[c]).map(c=>`<div class="cat" style="--c:${CAT[c]}"><i></i>${c}</div>${by[c].sort().map(i=>`<label class="item ${S.done[i]?"done":""}"><input type="checkbox" ${S.done[i]?"checked":""} onchange="S.done['${i}']=this.checked;save();draw()"><span>${i}${Q[i]?" – "+fmt(i,tot[i]):" (adults only)"}${cnt[i]>1?" ("+cnt[i]+" meals)":""}</span></label>`).join("")}`).join("")}`;
+}
+function draw(){
+  $("#modal").innerHTML=popHtml();
+  $("#unit").innerHTML=unitSeg();
+  $("#kids").innerHTML=S.kids.map((k,i)=>`<button class="chip" style="--c:${COL[i%6]}" aria-pressed="${i===S.cur}" onclick="pick(${i})">${esc(k.name)}</button>`).join("")+(S.kids.length<6?`<button class="ghost" onclick="addKid()">+ Add child</button>`:"");
+  document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.t===S.tab));
+  $("#view").innerHTML=({setup,menu,shop,cooked,tried})[S.tab]();
+}
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{S.tab=b.dataset.t;save();draw()});
+draw();
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
